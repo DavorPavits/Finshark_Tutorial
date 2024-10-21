@@ -38,7 +38,11 @@ public class StockController : ControllerBase
     public IActionResult CreateStock([FromBody] CreateStockRequestDto stockDto)
     {
         var stockModel = stockDto.ToStockFromCreateDTO();
+        //The id of the stock entity is not auto-generated, so in order to deal with the error of violating 
+        //the pk constraint in the database, the id is set manually, by finding the last id in the database 
+        //and increasing by 1
         stockModel.Id = _dbContext.Stocks.Max(e => e.Id) +1;
+        
         _dbContext.Stocks.Add(stockModel);
         _dbContext.SaveChanges();
 
