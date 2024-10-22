@@ -1,4 +1,6 @@
-﻿namespace FinShark.DTOS.Stock;
+﻿using FinShark.DTOS.Comment;
+
+namespace FinShark.DTOS.Stock;
 
 public class StockDto
 {
@@ -13,4 +15,5 @@ public class StockDto
     public long MarketCap { get; set; }
 
     //Coments where here but we are not yet using them
+    public List<CommentDto> Comments { get; set; }
 }

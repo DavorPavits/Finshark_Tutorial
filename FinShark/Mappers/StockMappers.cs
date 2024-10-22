@@ -12,10 +12,12 @@ public static class StockMappers
             Id = stockmodel.Id,
             Symbol = stockmodel.Symbol,
             CompanyName = stockmodel.CompanyName,
-            Purchase  = stockmodel.Purchase,
+            Purchase = stockmodel.Purchase,
             LastDiv = stockmodel.LastDiv,
             Industry = stockmodel.Industry,
-            MarketCap  =stockmodel.MarketCap
+            MarketCap = stockmodel.MarketCap,
+            Comments = stockmodel.Comments.Select(c => c.ToCommentDto()).ToList()
+
         };
     }
 
