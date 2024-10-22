@@ -1,5 +1,6 @@
 ﻿using FinShark.Data;
 using FinShark.DTOS.Stock;
+using FinShark.Interfaces;
 using FinShark.Mappers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,16 +12,20 @@ namespace FinShark.Controllers;
 public class StockController : ControllerBase
 {
     private readonly ApplicationDBContext _dbContext;
-    public StockController(ApplicationDBContext context)
+    private readonly IStockRepository _stockRepo;
+        
+
+    public StockController(ApplicationDBContext context, IStockRepository stockRepository)
     {
         _dbContext = context;
+        _stockRepo = stockRepository;
         
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAllStocks()
     {
-        var stocks = await _dbContext.Stocks.ToListAsync();
+        var stocks = await _stockRepo.GetAllAsync();
         var stockDto = stocks.Select(s=> s.ToStockDto());
 
         return Ok(stocks);
@@ -30,7 +35,7 @@ public class StockController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetStockById([FromRoute] int id) 
     {
-        var stock = await _dbContext.Stocks.FindAsync(id);
+        var stock = await _stockRepo.GetByIdAsync(id);
 
         if(stock == null) { return NotFound(); }
         return Ok(stock.ToStockDto());
@@ -43,10 +48,7 @@ public class StockController : ControllerBase
         //The id of the stock entity is not auto-generated, so in order to deal with the error of violating 
         //the pk constraint in the database, the id is set manually, by finding the last id in the database 
         //and increasing by 1
-        stockModel.Id = await _dbContext.Stocks.MaxAsync(e => e.Id) +1;
-        
-        await _dbContext.Stocks.AddAsync(stockModel);
-        await _dbContext.SaveChangesAsync();
+        await _stockRepo.CreateAsync(stockModel);
 
         return CreatedAtAction(nameof(GetStockById), new { id = stockModel.Id}, stockModel.ToStockDto());
 
@@ -56,17 +58,9 @@ public class StockController : ControllerBase
     [Route("{id}")]
     public async  Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateStockRequestDto updateDto)
     {
-        var stockModel = await _dbContext.Stocks.FirstOrDefaultAsync(x => x.Id == id);
+        var stockModel = await _stockRepo.UpdateAsync(id, updateDto);
         if (stockModel == null) { return NotFound(); }
 
-        stockModel.Symbol = updateDto.Symbol;
-        stockModel.CompanyName = updateDto.CompanyName;
-        stockModel.Purchase = updateDto.Purchase;
-        stockModel.LastDiv = updateDto.LastDiv;
-        stockModel.Industry = updateDto.Industry; 
-        stockModel.MarketCap = updateDto.MarketCap;
-
-        await _dbContext.SaveChangesAsync();
         return Ok(stockModel.ToStockDto());
     }
 
@@ -75,12 +69,11 @@ public class StockController : ControllerBase
     [Route("{id}")]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
-        var stockModel = await _dbContext.Stocks.FirstOrDefaultAsync(x => x.Id == id);
+        var stockModel = await _stockRepo.DeleteAsync(id);
 
         if (stockModel == null) { return NotFound(); }
 
-        _dbContext.Stocks.Remove(stockModel);
-        await _dbContext.SaveChangesAsync(true);
+      
         return NoContent();
     }
 
