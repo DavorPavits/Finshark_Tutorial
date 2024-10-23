@@ -2,11 +2,12 @@
 
 namespace FinShark.DTOS.Comment;
 
-public class CreateCommentDto
+public class UpdateCommentRequestDto
 {
+
     [Required]
-    [MinLength(1, ErrorMessage ="Title must be at least 1 character")]
-    [MaxLength(50, ErrorMessage ="Title cannot be over 50 characters")]
+    [MinLength(1, ErrorMessage = "Title must be at least 1 character")]
+    [MaxLength(50, ErrorMessage = "Title cannot be over 50 characters")]
     public string Title { get; set; } = string.Empty;
 
 

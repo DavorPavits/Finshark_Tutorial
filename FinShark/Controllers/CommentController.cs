@@ -3,6 +3,7 @@ using FinShark.DTOS.Comment;
 using FinShark.Interfaces;
 using FinShark.Mappers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Update.Internal;
 
 namespace FinShark.Controllers;
 
@@ -33,7 +34,7 @@ public class CommentController : ControllerBase
         
     }
 
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var comment = await _commentRepository.GetByIdAsync(id);
@@ -41,7 +42,7 @@ public class CommentController : ControllerBase
         return Ok(comment.ToCommentDto());
     }
 
-    [HttpPost("{stockId}")]
+    [HttpPost("{stockId: int}")]
     public async Task<IActionResult> Create([FromRoute] int stockId, CreateCommentDto commentDto)
     {
         if (!await _stockRepository.StockExists(stockId))
@@ -54,4 +55,27 @@ public class CommentController : ControllerBase
         return CreatedAtAction(nameof(GetById), new { id = commentModel.Id }, commentModel.ToCommentDto());
 
     }
+
+    [HttpPut]
+    [Route("{id:int}")]
+    public async Task<IActionResult> Update([FromRoute] int id, [FromBody] UpdateCommentRequestDto updaateDto)
+    {
+        var comment = await _commentRepository.UpdateAsync(id, updaateDto.ToCommentFromUpdateDto(id));
+
+        if (comment == null) { return NotFound(); }
+
+        return Ok(comment.ToCommentDto());
+    }
+
+    [HttpDelete]
+    [Route("{id: int}")]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        var commentModel = await _commentRepository.DeleteAsync(id);
+
+        if (commentModel == null) { return NotFound(); }
+
+        return Ok(commentModel);
+    }
+         
 }
