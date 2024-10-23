@@ -1,9 +1,12 @@
 ﻿using FinShark.Data;
+using FinShark.Helpers;
 using FinShark.Interfaces;
 using FinShark.Models;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace FinShark.Repository;
+
 
 public class CommentRepository : ICommentRepository
 {
@@ -14,8 +17,9 @@ public class CommentRepository : ICommentRepository
 		_dbContext = dBContext;
 	}
 
-    public async Task<List<Comment>> GetAllAsync()
+    public async Task<List<Comment>> GetAllAsync(CommentQueryObject queryObject)
     {
+      
         return await _dbContext.Comments.ToListAsync();
     }
 
@@ -53,5 +57,10 @@ public class CommentRepository : ICommentRepository
         _dbContext.Comments.Remove(commentModel);
         await _dbContext.SaveChangesAsync();
         return commentModel;
+    }
+
+    public Task<List<Comment>> GetAllAsync()
+    {
+        throw new NotImplementedException();
     }
 }
