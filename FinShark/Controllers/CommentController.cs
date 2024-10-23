@@ -1,5 +1,6 @@
 ﻿using FinShark.Data;
 using FinShark.DTOS.Comment;
+using FinShark.Helpers;
 using FinShark.Interfaces;
 using FinShark.Mappers;
 using Microsoft.AspNetCore.Mvc;
@@ -25,7 +26,7 @@ public class CommentController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllComments()
+    public async Task<IActionResult> GetAllComments([FromQuery] CommentQueryObject queryObject)
     {
         var comments = await _commentRepository.GetAllAsync();
         var commentDto = comments.Select(s => s.ToCommentDto());

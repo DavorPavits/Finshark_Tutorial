@@ -1,5 +1,6 @@
 ﻿using FinShark.Data;
 using FinShark.DTOS.Stock;
+using FinShark.Helpers;
 using FinShark.Interfaces;
 using FinShark.Mappers;
 using Microsoft.AspNetCore.Mvc;
@@ -23,10 +24,12 @@ public class StockController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetAllStocks()
+    public async Task<IActionResult> GetAllStocks([FromQuery] QueryObject query)
     {
-        var stocks = await _stockRepo.GetAllAsync();
-        var stockDto = stocks.Select(s=> s.ToStockDto());
+        if(!ModelState.IsValid) { return BadRequest(ModelState); }
+
+        var stocks = await _stockRepo.GetAllAsync(query);
+        var stockDto = stocks.Select(s=> s.ToStockDto()).ToList();
 
         return Ok(stocks);
     }
