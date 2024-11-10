@@ -3,6 +3,7 @@ using FinShark.DTOS.Comment;
 using FinShark.Helpers;
 using FinShark.Interfaces;
 using FinShark.Mappers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Update.Internal;
 
@@ -26,6 +27,7 @@ public class CommentController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetAllComments([FromQuery] CommentQueryObject queryObject)
     {
         var comments = await _commentRepository.GetAllAsync();
