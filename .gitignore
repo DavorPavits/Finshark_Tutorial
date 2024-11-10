@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 #Json Files
 .json
+FinShark/appsettings.json
